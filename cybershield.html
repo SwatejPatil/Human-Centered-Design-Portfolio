@@ -704,27 +704,71 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Carousel functionality
             const carousel = document.querySelector('.carousel-container');
             const slides = carousel.querySelectorAll('.carousel-slides img');
             const dots = carousel.querySelectorAll('.dot');
             const prevButton = carousel.querySelector('.prev');
             const nextButton = carousel.querySelector('.next');
             let currentSlide = 0;
+            let slideInterval;
 
             function showSlide(index) {
+                // Remove active class from all slides and dots
                 slides.forEach(slide => slide.classList.remove('active'));
                 dots.forEach(dot => dot.classList.remove('active'));
                 
+                // Update current slide index
                 currentSlide = (index + slides.length) % slides.length;
+                
+                // Add active class to current slide and dot
                 slides[currentSlide].classList.add('active');
                 dots[currentSlide].classList.add('active');
             }
 
-            prevButton.addEventListener('click', () => showSlide(currentSlide - 1));
-            nextButton.addEventListener('click', () => showSlide(currentSlide + 1));
+            function startSlideInterval() {
+                // Clear any existing interval
+                if (slideInterval) {
+                    clearInterval(slideInterval);
+                }
+                // Start new interval
+                slideInterval = setInterval(() => {
+                    showSlide(currentSlide + 1);
+                }, 5000); // Change slide every 5 seconds
+            }
+
+            // Event listeners for buttons
+            prevButton.addEventListener('click', () => {
+                showSlide(currentSlide - 1);
+                startSlideInterval(); // Reset interval when manually changing slides
+            });
+
+            nextButton.addEventListener('click', () => {
+                showSlide(currentSlide + 1);
+                startSlideInterval(); // Reset interval when manually changing slides
+            });
             
+            // Event listeners for dots
             dots.forEach((dot, index) => {
-                dot.addEventListener('click', () => showSlide(index));
+                dot.addEventListener('click', () => {
+                    showSlide(index);
+                    startSlideInterval(); // Reset interval when manually changing slides
+                });
+            });
+
+            // Start the automatic slideshow
+            startSlideInterval();
+
+            // Pause slideshow when hovering over carousel
+            carousel.addEventListener('mouseenter', () => {
+                if (slideInterval) {
+                    clearInterval(slideInterval);
+                }
+            });
+
+            // Resume slideshow when mouse leaves carousel
+            carousel.addEventListener('mouseleave', () => {
+                startSlideInterval();
             });
 
             // Deployment Phases Animation
